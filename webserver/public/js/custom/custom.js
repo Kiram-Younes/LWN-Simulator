@@ -1262,6 +1262,13 @@ function IsValidKey(key){
     return true;
 }
 
+function IsValidHexPayload(payload,multiline){
+    var regex = new RegExp("^([a-fA-f0-9]{2})+$");
+    if (!multiline) return regex.test(payload);
+
+    // split payload into hex string array and validate
+    return payload.split(/\r?\n/).every(line => regex.test(line));
+}
 //********************* Functionality ********************* 
 function CanExecute(){
 
@@ -2157,6 +2164,9 @@ function CleanInputDevice(){
     $("#add-dev *").removeClass("active show");
     $("#general-tab").addClass("active");
     $("#general").addClass("active show");
+
+    //payload
+    $("#textarea-payload").removeClass("is-invalid");
 }
 
 function ChangeStateActivation(otaa){
@@ -2293,6 +2303,7 @@ function LoadDevice(dev){
     $("#truncates").prop("checked",!dev.info.configuration.supportedFragment);
   
     $("#multipayloads").prop("checked", dev.info.status.multipayloads);
+    $("#hexpayload").prop("checked", dev.info.status.hexpayload);
     $("#textarea-payload").val(dev.info.status.payload);
 
     ChangeStateInputDevice(true,dev.info.devEUI);
@@ -2504,12 +2515,14 @@ function Click_SaveDevice(){
     var mtype = $("#confirmed").prop("checked") ? ConfirmedData_uplink : UnConfirmedData_uplink; //true Confirmed
     var upInterval = $("[name=input-sendInterval]");
     var multipayloads = $("[name=input-multipayloads]").prop("checked");
-    var payload = $("#textarea-payload").val();
+    var hexpayload = $("[name=input-hexpayload]").prop("checked");
+    var payload = $("#textarea-payload");
 
     upInterval.val(upInterval.val() == "" ? UplinkIntervalDefault : upInterval.val());
     var validInterval = IsValidNumber(upInterval.val(),-1,Infinity);
+    var validPayload = hexpayload? IsValidHexPayload(payload.val(), multipayloads) : true;
 
-    validation = validation && validInterval;
+    validation = validation && validInterval && validPayload;
     
     if (!validation){
         Show_ErrorSweetToast("Error","Values are incorrect");
@@ -2539,6 +2552,7 @@ function Click_SaveDevice(){
         ValidationInput(altitude, true);
 
         ValidationInput(upInterval,validInterval);
+        ValidationInput(payload,validPayload);
         
         return;
     }
@@ -2568,7 +2582,8 @@ function Click_SaveDevice(){
                 },
                 "mtype": mtype,
                 "multipayloads": multipayloads,
-                "payload":payload,
+                "payload":payload.val(),
+                "hexpayload": hexpayload,
                 "fcntDown": Number(fcntDown.val())
             },
             "configuration":{

@@ -1,6 +1,7 @@
 package device
 
 import (
+	"encoding/hex"
 	"strings"
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
 	up "github.com/arslab/lwnsimulator/simulator/components/device/frames/uplink"
@@ -67,16 +68,34 @@ func (d *Device) CreateUplink() [][]byte {
 					} else {
 						d.Info.Status.LastPayloadLine++
 					}
-					lastline := []byte(temp[d.Info.Status.LastPayloadLine])
-					//payload.UnmarshalBinary(true, lastline)
-					payload = &lorawan.DataPayload{ Bytes: lastline}
+					// check id payload is a hex string
+					if d.Info.Status.HexPayloads {
+						hexStr, _ := hex.DecodeString(string(temp[d.Info.Status.LastPayloadLine]))
+						payload = &lorawan.DataPayload{ Bytes: hexStr}
+					} else {
+						lastline := []byte(temp[d.Info.Status.LastPayloadLine])
+						payload = &lorawan.DataPayload{ Bytes: lastline}
+					}
 					
 				} else {
-					payload = d.Info.Status.Payload
+					// check id payload is a hex string
+					if d.Info.Status.HexPayloads {
+						pb, _ := d.Info.Status.Payload.MarshalBinary()
+						hexStr, _ := hex.DecodeString(string(pb))
+						payload = &lorawan.DataPayload{ Bytes: hexStr}
+					} else {
+						payload = d.Info.Status.Payload
+					}	
 				}
 			} else {
-				//d.Print(string(pb), nil, util.PrintOnlyConsole)
-				payload = d.Info.Status.Payload
+				// check id payload is a hex string
+				if d.Info.Status.HexPayloads {
+					pb, _ := d.Info.Status.Payload.MarshalBinary()
+					hexStr, _ := hex.DecodeString(string(pb))
+					payload = &lorawan.DataPayload{ Bytes: hexStr}
+				} else {
+					payload = d.Info.Status.Payload
+				}					
 			}
 		}
 

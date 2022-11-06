@@ -19,6 +19,7 @@ type Status struct {
 	DataUplink    up.InfoUplink   `json:"infoUplink"`
 	MType         lorawan.MType   `json:"mtype"`   // from UI
 	MultiPayloads bool            `json:"multipayloads"`
+	HexPayloads bool            `json:"hexpayload"`
 	Payload       lorawan.Payload `json:"payload"` // from UI
 	BufferUplinks []mup.InfoFrame `json:"-"`       // from socket
 
