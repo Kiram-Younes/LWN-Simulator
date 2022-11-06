@@ -18,6 +18,7 @@ type Status struct {
 
 	DataUplink    up.InfoUplink   `json:"infoUplink"`
 	MType         lorawan.MType   `json:"mtype"`   // from UI
+	MultiPayloads bool            `json:"multipayloads"`
 	Payload       lorawan.Payload `json:"payload"` // from UI
 	BufferUplinks []mup.InfoFrame `json:"-"`       // from socket
 
@@ -37,6 +38,7 @@ type Status struct {
 	CounterRepUnConfirmedDataUp uint8         `json:"-"`
 	LastMType                   lorawan.MType `json:"-"`
 	LastUplinks                 [][]byte      `json:"-"`
+	LastPayloadLine int						  `json:"-"`
 }
 
 func (s *Status) MarshalJSON() ([]byte, error) {

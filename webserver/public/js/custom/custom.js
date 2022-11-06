@@ -2292,6 +2292,7 @@ function LoadDevice(dev){
     $("#fragments").prop("checked",dev.info.configuration.supportedFragment);
     $("#truncates").prop("checked",!dev.info.configuration.supportedFragment);
   
+    $("#multipayloads").prop("checked", dev.info.status.multipayloads);
     $("#textarea-payload").val(dev.info.status.payload);
 
     ChangeStateInputDevice(true,dev.info.devEUI);
@@ -2502,6 +2503,7 @@ function Click_SaveDevice(){
 
     var mtype = $("#confirmed").prop("checked") ? ConfirmedData_uplink : UnConfirmedData_uplink; //true Confirmed
     var upInterval = $("[name=input-sendInterval]");
+    var multipayloads = $("[name=input-multipayloads]").prop("checked");
     var payload = $("#textarea-payload").val();
 
     upInterval.val(upInterval.val() == "" ? UplinkIntervalDefault : upInterval.val());
@@ -2565,6 +2567,7 @@ function Click_SaveDevice(){
                     "fcnt": Number(Fcnt.val()),
                 },
                 "mtype": mtype,
+                "multipayloads": multipayloads,
                 "payload":payload,
                 "fcntDown": Number(fcntDown.val())
             },

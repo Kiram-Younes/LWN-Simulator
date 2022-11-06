@@ -47,6 +47,7 @@ func (d *Device) Setup(Resources *res.Resources, forwarder *f.Forwarder) {
 
 	d.Info.Status.CounterRepUnConfirmedDataUp = 1
 	d.Info.Configuration.NbRepUnconfirmedDataUp = 1
+	d.Info.Status.LastPayloadLine = -1
 
 	//class C
 	if d.Info.Configuration.SupportedClassC {

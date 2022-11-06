@@ -1,6 +1,7 @@
 package device
 
 import (
+	"strings"
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
 	up "github.com/arslab/lwnsimulator/simulator/components/device/frames/uplink"
 	"github.com/arslab/lwnsimulator/simulator/util"
@@ -51,7 +52,32 @@ func (d *Device) CreateUplink() [][]byte {
 
 		} else {
 			mtype = d.Info.Status.MType
-			payload = d.Info.Status.Payload
+			// check if the payload is intended for separate line sending
+			if d.Info.Status.MultiPayloads {
+				// get the payload back as string array
+				pb, _ := d.Info.Status.Payload.MarshalBinary()
+				temp := strings.Split(string(pb), "\n") // must implement a solution for other platforms
+
+				// check the length of the multi line payload
+				len := len(temp)
+				if len > 1 {
+					// get last line index
+					if (d.Info.Status.LastPayloadLine + 1) >= len {
+						d.Info.Status.LastPayloadLine = 0
+					} else {
+						d.Info.Status.LastPayloadLine++
+					}
+					lastline := []byte(temp[d.Info.Status.LastPayloadLine])
+					//payload.UnmarshalBinary(true, lastline)
+					payload = &lorawan.DataPayload{ Bytes: lastline}
+					
+				} else {
+					payload = d.Info.Status.Payload
+				}
+			} else {
+				//d.Print(string(pb), nil, util.PrintOnlyConsole)
+				payload = d.Info.Status.Payload
+			}
 		}
 
 		d.Info.Status.LastMType = mtype
