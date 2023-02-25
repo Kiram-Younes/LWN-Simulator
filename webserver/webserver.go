@@ -18,7 +18,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	socketio "github.com/googollee/go-socket.io"
-	"github.com/rakyll/statik/fs"
 )
 
 //WebServer type
@@ -51,7 +50,7 @@ func NewWebServer(config *models.ServerConfig, controller cnt.SimulatorControlle
 
 	}()
 
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	router := gin.New()
 
 	configCors := cors.DefaultConfig()
@@ -71,13 +70,14 @@ func NewWebServer(config *models.ServerConfig, controller cnt.SimulatorControlle
 		ServerSocket: serverSocket,
 	}
 
-	staticFS, err := fs.New()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//staticFS, err := fs.New()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	staticGroup := router.Group("/dashboard")
-	staticGroup.StaticFS("/", staticFS)
+	//staticGroup.StaticFS("/", staticFS)
+	staticGroup.Static("", "../webserver/public");
 	//router.Use(static.Serve("/", staticFS))
 
 	apiRoutes := router.Group("/api")
